@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28917.182
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mango.ZooKeeperNet.Util", "Mango.ZooKeeperNet.Util\Mango.ZooKeeperNet.Util.csproj", "{4A5550BE-5316-4C00-89D3-25218110EA25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mango.ZooKeeperNet.ConsoleApp", "Mango.ZooKeeperNet.ConsoleApp\Mango.ZooKeeperNet.ConsoleApp.csproj", "{661D90F0-4F5D-4E07-94F0-416AC54537F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mango.Nodis", "Mango.Nodis\Mango.Nodis.csproj", "{3F5B2186-245B-4CAB-9AC5-317D5BE0A9C2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4A5550BE-5316-4C00-89D3-25218110EA25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A5550BE-5316-4C00-89D3-25218110EA25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A5550BE-5316-4C00-89D3-25218110EA25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A5550BE-5316-4C00-89D3-25218110EA25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{661D90F0-4F5D-4E07-94F0-416AC54537F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{661D90F0-4F5D-4E07-94F0-416AC54537F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{661D90F0-4F5D-4E07-94F0-416AC54537F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{661D90F0-4F5D-4E07-94F0-416AC54537F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F5B2186-245B-4CAB-9AC5-317D5BE0A9C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F5B2186-245B-4CAB-9AC5-317D5BE0A9C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F5B2186-245B-4CAB-9AC5-317D5BE0A9C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F5B2186-245B-4CAB-9AC5-317D5BE0A9C2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D223B2FE-E7FC-4DFE-ABC8-E5021B8F63D0}
+	EndGlobalSection
+EndGlobal
