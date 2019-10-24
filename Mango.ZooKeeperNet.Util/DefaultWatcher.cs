@@ -14,6 +14,10 @@ namespace Mango.ZooKeeperNet.Util
         public ZooKeeperClient _zk;
         public DefaultWatcher(ILog log, ZooKeeperClient zk)
         {
+            if (log == null)
+            {
+                log= LogManager.GetLogger(typeof(DefaultWatcher));
+            }
             _log = log;
             _zk = zk;
         }

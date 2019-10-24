@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Mango.ZooKeeperNet.Util
 {
-    public class ZooKeeperClient
+    public class ZooKeeperClient: IDisposable
     {
         public IZookeeperClient client;
-        public ZooKeeperClient(string connectionString, double SessionTimeout=20)
+        public ZooKeeperClient(string connectionString, double SessionTimeout = 20)
         {
             client = new ZookeeperClient(new ZookeeperClientOptions(connectionString)
             {
@@ -42,6 +42,46 @@ namespace Mango.ZooKeeperNet.Util
         public Task<IEnumerable<string>> SubscribeChildrenChange(string path, NodeChildrenChangeHandler listener)
         {
             return client.SubscribeChildrenChange(path, listener);
+        }
+
+        /// <summary>
+        /// 执行与释放或重置非托管资源
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        /// <summary>
+        /// 由终结器调用以释放资源。
+        /// </summary>
+        ~ZooKeeperClient()
+        {
+            Dispose(false);
+        }
+        /// <summary>
+        /// 获取或设置一个值。该值指示资源已经被释放。
+        /// </summary>
+        private bool _disposed;
+        /// <summary>
+        /// 执行与释放或重置非托管资源相关的应用程序定义的任务。
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+            if (disposing)
+            {
+                // 清理托管资源
+                if (client != null)
+                {
+                    client.Dispose();
+                }
+            }
+            // 标记已经被释放。
+            _disposed = true;
         }
     }
 }

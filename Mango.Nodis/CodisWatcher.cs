@@ -1,14 +1,18 @@
 ﻿using log4net;
 using Mango.ZooKeeperNet.Util;
+using org.apache.zookeeper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Mango.Nodis
 {
     public class CodisWatcher : DefaultWatcher
     {
+        public delegate void DeleteNodeDel(List<CodisProxyInfo> pools);
+        public delegate void AddNodeDel(List<CodisProxyInfo> pools);
         /// <summary>
         /// 要监听的节点
         /// </summary>
@@ -16,45 +20,71 @@ namespace Mango.Nodis
 
         public string Path
         {
-            get { return $"/jodis.{path}"; }
+            get { return $"/jodis/{path}"; }
             set { path = value; }
         }
 
-        private List<CodisProxyInfo> pools = new List<CodisProxyInfo>();
+        private List<CodisProxyInfo> pools;
         public CodisWatcher(ILog log, ZooKeeperClient zk, string path) : base(log, zk)
         {
             this.path = path;
         }
+        public List<CodisProxyInfo> GetPools()
+        {
+            if (pools == null)
+            {
+                CodisProxyInfo itemCodisProxy = null;
+                var allPools = new List<CodisProxyInfo>();
+                var childPath = _zk.client.GetChildrenAsync(Path).Result;
+                foreach (var itemPath in childPath)
+                {
+                    var iteData = _zk.client.GetDataAsync($"{Path}/{itemPath}").Result;
+                    itemCodisProxy = JsonToObject<CodisProxyInfo>(Encoding.UTF8.GetString(iteData.ToArray()));
+                    itemCodisProxy.Node = itemPath;
+                    allPools.Add(itemCodisProxy);
+                }
+                pools = allPools;
+            }
+            return pools;
+        }
+        public DeleteNodeDel deleteNodeDel;
+        public AddNodeDel addNodeDel;
         public override void ProcessWatched()
         {
             base.ProcessWatched();
             _zk.SubscribeStatusChange(async (ct, args) =>
             {
-                CodisProxyInfo itemCodisProxy = null;
-                if (args.State == org.apache.zookeeper.Watcher.Event.KeeperState.SyncConnected)
+                if (args.State == Watcher.Event.KeeperState.SyncConnected)
                 {
-                    IEnumerable<string> childPath = await _zk.client.GetChildrenAsync(Path);
-                    _log.DebugFormat($"初始化节点开始");
-                    foreach (var itemPath in childPath)
+                    //检查是否存在根节点，不存在则写入
+                    if (await _zk.client.ExistsAsync("/jodis") == false)
                     {
-                        var iteData = await _zk.client.GetDataAsync($"{Path}/{itemPath}");
-                        itemCodisProxy = JsonToObject<CodisProxyInfo>(Encoding.UTF8.GetString(iteData.ToArray()));
-                        itemCodisProxy.Node = itemPath;
-                        pools.Add(itemCodisProxy);
-                        _log.DebugFormat($"加载节点:{itemCodisProxy.Node}={itemCodisProxy.Addr}-{itemCodisProxy.State}");
+                        try
+                        {
+                            var firstPathData = _zk.client.CreateAsync("/jodis", null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+                            _log.DebugFormat($"创建根节点{0}", firstPathData);
+                        }
+                        catch (Exception ex)
+                        {
+                            _log.ErrorFormat($"创建根节点-异常:{0}", ex.Message.ToString());
+                        }
                     }
-                    _log.DebugFormat($"初始化节点完成");
+                    _ = this.GetPools();
+                    _log.DebugFormat($"初始化节点开始");
                     _log.DebugFormat($"online上线节点:");
                     pools.FindAll(m => m.State == "online").Select(m => m.Addr).Distinct().ToList().ForEach(n =>
                     {
                         _log.DebugFormat($"{n}");
                     });
-                    _log.DebugFormat($"offline下线节点:");
-                    pools.FindAll(m => m.State == "offline").Select(m => m.Addr).Distinct().ToList().ForEach(n =>
-                    {
-                        _log.DebugFormat($"{n}");
-                    });
+                    _log.DebugFormat($"初始化节点完成");
+
+                    //_log.DebugFormat($"offline下线节点:");
+                    //pools.FindAll(m => m.State == "offline").Select(m => m.Addr).Distinct().ToList().ForEach(n =>
+                    //{
+                    //    _log.DebugFormat($"{n}");
+                    //});
                 }
+                //return CompletedTask;
             });
             _zk.SubscribeChildrenChange(Path, (ct, args) =>
             {
@@ -87,20 +117,35 @@ namespace Mango.Nodis
                             poolCodisProxy.State = itemCodisProxy.State;
                         }
                     }
-
-                    pools.FindAll(m => m.Flag == 0).ForEach(n =>
+                    var deletePools = pools.FindAll(m => m.Flag == 0);
+                    if (deletePools.Count > 0)
                     {
-                        _log.DebugFormat($"删除节点:{n.Node}={n.Addr}-{n.State}");
-                        pools.Remove(n);
-                    });
-                    pools.FindAll(m => m.Flag == 1).ForEach(n =>
+                        if (deleteNodeDel != null)
+                        {
+                            deleteNodeDel(deletePools);
+                        }
+                        deletePools.ForEach(n =>
+                        {
+                            //_log.DebugFormat($"删除节点:{n.Node}={n.Addr}-{n.State}");
+                            pools.Remove(n);
+                        });
+                    }
+                    var addPools = pools.FindAll(m => m.Flag == 1);
+                    if (addPools.Count > 0)
                     {
-                        _log.DebugFormat($"新增节点:{n.Node}={n.Addr}-{n.State}");
-                    });
-                    pools.FindAll(m => m.Flag == 2).ForEach(n =>
-                    {
-                        _log.DebugFormat($"编辑节点:{n.Node}={n.Addr}-{n.State}");
-                    });
+                        if (addNodeDel != null)
+                        {
+                            addNodeDel(addPools);
+                        }
+                        //addPools.ForEach(n =>
+                        //{
+                        //    _log.DebugFormat($"新增节点:{n.Node}={n.Addr}-{n.State}");
+                        //});
+                    }
+                    //pools.FindAll(m => m.Flag == 2).ForEach(n =>
+                    //{
+                    //    _log.DebugFormat($"编辑节点:{n.Node}={n.Addr}-{n.State}");
+                    //});
                 }
                 return CompletedTask;
             });
