@@ -65,8 +65,7 @@ namespace Mango.ZooKeeperNet.ConsoleApp
         {
             try
             {
-                var redisPool = RoundRobinSSRedisPool.Create().CuratorClient("192.168.4.144:20000", 5000).ZkProxyDir("mango")
-                   .Build();
+                var redisPool = RoundRobinSSRedisPool.Create().CuratorClient("192.168.4.144:20000", 5000).ZkProxyDir("mango").Build();
                 //使用连接池查询
                 using (var redisClient = redisPool.GetClient())
                 {
@@ -85,7 +84,7 @@ namespace Mango.ZooKeeperNet.ConsoleApp
                             log.InfoFormat("查询redis:k1={0}", value);
                         }
                     }
-                    else if(get=="10")
+                    else if (get == "10")
                     {
                         break;
                     }
@@ -94,7 +93,7 @@ namespace Mango.ZooKeeperNet.ConsoleApp
 
             catch (Exception ex)
             {
-                log.InfoFormat("程序异常:{0}", ex.ToString());
+                log.ErrorFormat("程序异常:{0}", ex.ToString());
             }
             Console.ReadKey();
         }
