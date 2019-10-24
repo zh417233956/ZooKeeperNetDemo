@@ -38,7 +38,7 @@ namespace Mango.Nodis
         }
         #endregion ZK配置
 
-        public IRedisClientsManager Build()
+        public RedisPool Build()
         {
             #region zk配置获取及建立监听
             validate();
@@ -46,20 +46,55 @@ namespace Mango.Nodis
             {
                 zkhelper.Dispose();
             }
-            zkhelper = new ZooKeeperHelper(log, zkAddr, zkProxyDir, zkSessionTimeoutMs);                      
-            zkhelper.addNodeDel = (nodes) =>
+            zkhelper = new ZooKeeperHelper(log, zkAddr, zkProxyDir, zkSessionTimeoutMs,
+                (nodes) =>
+                {
+                    foreach (var item in nodes)
+                    {
+                        log.InfoFormat("新增节点：{0}", item.Addr);
+                    }
+                    CreateManager();
+                },
+                (nodes) =>
+                {
+                    foreach (var item in nodes)
+                    {
+                        log.InfoFormat("删除节点：{0}", item.Addr);
+                    }
+                    CreateManager();
+                });
+
+            #region 打日志
+            //TODO:日志代码
+            var pools = zkhelper.pools;
+            foreach (var itemCodisProxy in pools)
             {
-                CreateManager();
-            };
-            zkhelper.deleteNodeDel = (nodes) =>
-            {
-                CreateManager();
-            };
+                log.DebugFormat($"加载节点:{itemCodisProxy.Node}={itemCodisProxy.Addr}-{itemCodisProxy.State}");
+            }
+            #endregion 打日志
+
             #endregion zk配置获取及建立监听
 
             CreateManager();
 
-            return Manager;
+            return this;
+        }
+
+        /// <summary>
+        /// 创建Redis连接
+        /// </summary>
+        /// <returns></returns>
+        public IRedisClient GetClient()
+        {
+            try
+            {
+                var client = Manager.GetClient();
+                return client;
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
         }
         /// <summary>
         /// 建立连接池

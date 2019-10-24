@@ -12,25 +12,25 @@ namespace Mango.Nodis
     {
         private static ILog _log;
         public ZooKeeperClient _zk;
-        public CodisWatcher.DeleteNodeDel deleteNodeDel;
-        public CodisWatcher.AddNodeDel addNodeDel;
+        private CodisWatcher.DeleteNodeDel deleteNodeDel;
+        private CodisWatcher.AddNodeDel addNodeDel;
         CodisWatcher codiswatcher;
-        public ZooKeeperHelper(ILog log, string connectionString, string proxy, double SessionTimeout = 20)
+        public ZooKeeperHelper(ILog log, string connectionString, string proxy, double SessionTimeout = 20, CodisWatcher.AddNodeDel addNodeDel = null, CodisWatcher.DeleteNodeDel deleteNodeDel = null)
         {
             _log = log;
             _zk = new ZooKeeperClient(connectionString, SessionTimeout);
-            codiswatcher = new CodisWatcher(log, _zk, proxy);
-            codiswatcher.addNodeDel = addNodeDel;
-            codiswatcher.deleteNodeDel = deleteNodeDel;
+            this.addNodeDel = addNodeDel;
+            this.deleteNodeDel = deleteNodeDel;
+            codiswatcher = new CodisWatcher(log, _zk, proxy, addNodeDel, deleteNodeDel);
             codiswatcher.ProcessWatched();
         }
         public List<CodisProxyInfo> pools => codiswatcher.GetPools();
-       
+
         /// <summary>
         /// 执行与释放或重置非托管资源
         /// </summary>
         public void Dispose()
-        {            
+        {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -56,7 +56,7 @@ namespace Mango.Nodis
             }
             if (disposing)
             {
-            }           
+            }
             // 标记已经被释放。
             _disposed = true;
         }

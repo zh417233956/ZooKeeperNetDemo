@@ -18,15 +18,24 @@ namespace Mango.Nodis
         /// </summary>
         private string path;
 
+        //TODO:正式使用
+        //public string Path
+        //{
+        //    get { return $"/jodis/{path}"; }
+        //    set { path = value; }
+        //}
+
         public string Path
         {
-            get { return $"/jodis/{path}"; }
+            get { return $"/jodis.{path}"; }
             set { path = value; }
         }
 
         private List<CodisProxyInfo> pools;
-        public CodisWatcher(ILog log, ZooKeeperClient zk, string path) : base(log, zk)
+        public CodisWatcher(ILog log, ZooKeeperClient zk, string path, AddNodeDel addNodeDel, DeleteNodeDel deleteNodeDel) : base(log, zk)
         {
+            this.addNodeDel = addNodeDel;
+            this.deleteNodeDel = deleteNodeDel;
             this.path = path;
         }
         public List<CodisProxyInfo> GetPools()
@@ -47,8 +56,8 @@ namespace Mango.Nodis
             }
             return pools;
         }
-        public DeleteNodeDel deleteNodeDel;
-        public AddNodeDel addNodeDel;
+        private DeleteNodeDel deleteNodeDel;
+        private AddNodeDel addNodeDel;
         public override void ProcessWatched()
         {
             base.ProcessWatched();
@@ -120,15 +129,17 @@ namespace Mango.Nodis
                     var deletePools = pools.FindAll(m => m.Flag == 0);
                     if (deletePools.Count > 0)
                     {
-                        if (deleteNodeDel != null)
-                        {
-                            deleteNodeDel(deletePools);
-                        }
+                        var deletedPools= new List<CodisProxyInfo>();
                         deletePools.ForEach(n =>
                         {
                             //_log.DebugFormat($"删除节点:{n.Node}={n.Addr}-{n.State}");
+                            deletedPools.Add(n);
                             pools.Remove(n);
                         });
+                        if (deleteNodeDel != null)
+                        {
+                            deleteNodeDel(deletedPools);
+                        }
                     }
                     var addPools = pools.FindAll(m => m.Flag == 1);
                     if (addPools.Count > 0)
