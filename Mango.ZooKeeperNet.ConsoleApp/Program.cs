@@ -157,6 +157,7 @@ namespace Mango.ZooKeeperNet.ConsoleApp
                     log.ErrorFormat("异常信息:{0}", ex.ToString());
                 }
             }
+            Console.ReadKey();
         }
     }
     public static class RedisPoolManager

@@ -127,7 +127,16 @@ namespace Mango.Nodis
                 Manager.Dispose();
                 log.InfoFormat("销毁Redis连接池完成");
             }
-            log.InfoFormat("创建Redis连接池，redisMasterHosts：{0}", redisMasterHosts);
+
+            #region 只为打日志
+            string redisMasterHostsStr = "";
+            foreach (var itemHost in redisMasterHosts)
+            {
+                redisMasterHostsStr += itemHost + ",";
+            }
+            log.InfoFormat("创建Redis连接池，redisMasterHosts：{0}", redisMasterHostsStr.TrimEnd(','));
+            #endregion 只为打日志
+
             Manager = new PooledRedisClientManager(redisMasterHosts, redisSlaveHosts, redisClientManagerConfig)
             {
                 PoolTimeout = 2000,
