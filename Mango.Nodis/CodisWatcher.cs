@@ -40,7 +40,7 @@ namespace Mango.Nodis
         }
         public List<CodisProxyInfo> GetPools()
         {
-            if (pools == null)
+            if (pools == null || _zkReconnPoolState == 1)
             {
                 CodisProxyInfo itemCodisProxy = null;
                 var allPools = new List<CodisProxyInfo>();
@@ -53,6 +53,15 @@ namespace Mango.Nodis
                     allPools.Add(itemCodisProxy);
                 }
                 pools = allPools;
+                //如果是断网重连，激活添加节点委托事件
+                if (_zkReconnPoolState == 1)
+                {
+                    _zkReconnPoolState = 0;
+                    if (addNodeDel != null)
+                    {
+                        addNodeDel(pools);
+                    }
+                }
             }
             return pools;
         }
@@ -129,7 +138,7 @@ namespace Mango.Nodis
                     var deletePools = pools.FindAll(m => m.Flag == 0);
                     if (deletePools.Count > 0)
                     {
-                        var deletedPools= new List<CodisProxyInfo>();
+                        var deletedPools = new List<CodisProxyInfo>();
                         deletePools.ForEach(n =>
                         {
                             //_log.InfoFormat($"删除节点:{n.Node}={n.Addr}-{n.State}");

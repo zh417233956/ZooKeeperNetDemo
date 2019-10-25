@@ -12,6 +12,10 @@ namespace Mango.ZooKeeperNet.Util
     {
         public static ILog _log;
         public ZooKeeperClient _zk;
+        /// <summary>
+        /// zk重连状态标记 0连接状态，1断开连接
+        /// </summary>
+        public int _zkReconnPoolState = 0;
         public DefaultWatcher(ILog log, ZooKeeperClient zk)
         {
             if (log == null)
@@ -31,6 +35,7 @@ namespace Mango.ZooKeeperNet.Util
                 if (args.State == org.apache.zookeeper.Watcher.Event.KeeperState.Disconnected)
                 {
                     _log.ErrorFormat("SubscribeStatusChange接收到ZooKeeper服务端的通知，State是：{0}", args.State);
+                    _zkReconnPoolState = 1;
                     var waitState = false;
                     while (!waitState)
                     {
