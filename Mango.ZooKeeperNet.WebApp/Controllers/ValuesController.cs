@@ -29,7 +29,7 @@ namespace Mango.ZooKeeperNet.WebApp.Controllers
             }
             catch (Exception ex)
             {
-                log.ErrorFormat("异常信息:{0}", ex.ToString());
+                log.ErrorFormat("异常信息:{0}", ex.Message.ToString());
             }
             return result;
         }

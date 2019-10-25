@@ -38,6 +38,14 @@ namespace Mango.Nodis
         }
         #endregion ZK配置
 
+
+        RedisClientManagerConfig redisClientManagerConfig;
+        public RedisPool PoolConfig(RedisClientManagerConfig redisClientManagerConfig)
+        {
+            this.redisClientManagerConfig = redisClientManagerConfig;
+            return this;
+        }
+
         public RedisPool Build()
         {
             #region zk配置获取及建立监听
@@ -113,14 +121,16 @@ namespace Mango.Nodis
             //{
             //    redisSlaveHosts = slaveConnection.Split(',');
             //}
-            // RedisDefaultDb配置
-            int defaultDb = 0;
-            var redisClientManagerConfig = new RedisClientManagerConfig
+
+            if (redisClientManagerConfig == null)
             {
-                MaxWritePoolSize = 2,
-                DefaultDb = defaultDb,
-                AutoStart = true
-            };
+                redisClientManagerConfig = new RedisClientManagerConfig
+                {
+                    MaxWritePoolSize = 2,
+                    DefaultDb = 0,
+                    AutoStart = true
+                };
+            }
             // 创建Redis连接池
             if (Manager != null)
             {
