@@ -65,20 +65,33 @@ namespace Mango.ZooKeeperNet.ConsoleApp
         {
             try
             {
-                var redisPool = RoundRobinSSRedisPool.Create().CuratorClient("192.168.4.144:20000", 5000).ZkProxyDir("mango").Build();
-                //使用连接池查询
-                using (var redisClient = redisPool.GetClient())
+                // java jodis 代码示例
+                //RoundRobinJedisPool jodisPool = RoundRobinJedisPool.create().curatorClient("192.168.4.144:20000", 5000).zkProxyDir(zkProxyDir).build();
+                //try (Jedis jedis = jodisPool.getResource()) {
+                //    jedis.set("k1", "v1");
+                //}
+
+                //var redisPool = RoundRobinSSRedisPool.Create().CuratorClient("192.168.4.144:20000", 5000).ZkProxyDir("mango").Build();
+                ////使用连接池查询
+                //using (var redisClient = redisPool.GetClient())
+                //{
+                //    var value = redisClient.Get<string>("k1");
+                //    log.InfoFormat("查询redis:k1={0}", value);
+                //}
+
+                // 最佳实践
+                using (var redisClient = RedisPoolManager.GetClient())
                 {
                     var value = redisClient.Get<string>("k1");
                     log.InfoFormat("查询redis:k1={0}", value);
                 }
+                
                 while (true)
                 {
                     var get = Console.ReadLine();
                     if (get == "1")
                     {
-                        //使用连接池查询
-                        using (var redisClient = redisPool.GetClient())
+                        using (var redisClient = RedisPoolManager.GetClient())
                         {
                             var value = redisClient.Get<string>("k1");
                             log.InfoFormat("查询redis:k1={0}", value);
@@ -96,6 +109,18 @@ namespace Mango.ZooKeeperNet.ConsoleApp
                 log.ErrorFormat("程序异常:{0}", ex.ToString());
             }
             Console.ReadKey();
+        }
+    }
+    public static class RedisPoolManager
+    {
+        private static readonly RedisPool redisPool;
+        static RedisPoolManager()
+        {
+            redisPool = RoundRobinSSRedisPool.Create().CuratorClient("192.168.4.144:20000", 5000).ZkProxyDir("mango").Build();
+        }
+        public static IRedisClient GetClient()
+        {
+            return redisPool.GetClient();
         }
     }
     public class MyCodisWatcher : DefaultWatcher

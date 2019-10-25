@@ -70,8 +70,8 @@ namespace Mango.Nodis
                     {
                         try
                         {
-                            var firstPathData = _zk.client.CreateAsync("/jodis", null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-                            _log.DebugFormat($"创建根节点{0}", firstPathData);
+                            _ = _zk.client.CreateAsync("/jodis", null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+                            _log.DebugFormat($"创建根节点:/jodis");
                         }
                         catch (Exception ex)
                         {
