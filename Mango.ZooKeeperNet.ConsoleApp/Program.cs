@@ -61,7 +61,7 @@ namespace Mango.ZooKeeperNet.ConsoleApp
 
             Console.ReadKey();
         }
-        static void Main(string[] args)
+        static void Main5(string[] args)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace Mango.ZooKeeperNet.ConsoleApp
                     var value = redisClient.Get<string>("k1");
                     log.InfoFormat("查询redis:k1={0}", value);
                 }
-                
+
                 while (true)
                 {
                     var get = Console.ReadLine();
@@ -94,7 +94,7 @@ namespace Mango.ZooKeeperNet.ConsoleApp
                         using (var redisClient = RedisPoolManager.GetClient())
                         {
                             var value = redisClient.Get<string>("k1");
-                            log.InfoFormat("查询redis:k1={0}", value);
+                            //log.InfoFormat("查询redis:k1={0}", value);
                         }
                     }
                     else if (get == "10")
@@ -110,13 +110,62 @@ namespace Mango.ZooKeeperNet.ConsoleApp
             }
             Console.ReadKey();
         }
+
+        static void Main6(string[] args)
+        {
+            try
+            {
+                while (true)
+                {
+                    using (var redisClient = RedisPoolManager.GetClient())
+                    {
+                        var value = redisClient.Get<string>("k1");
+                        log.InfoFormat("查询redis:k1={0}", value);
+                    }
+                    System.Threading.Thread.Sleep(500);
+                }
+            }
+
+            catch (Exception ex)
+            {
+                log.ErrorFormat("程序异常:{0}", ex.ToString());
+            }
+            Console.ReadKey();
+        }
+        static void Main(string[] args)
+        {
+            using (var redisClient = RedisPoolManager.GetClient())
+            {
+                redisClient.Db = 5;
+                redisClient.Set<string>("codis-proxy", "nodis");
+                log.DebugFormat("写入addr:{0},redis:{1}={2}", redisClient.Host + redisClient.Port, "codis-proxy", "nodis");
+            }
+            while (true)
+            {
+                try
+                {
+                    using (var redisClient = RedisPoolManager.GetClient())
+                    {
+                        redisClient.Db = 5;
+                        var value = redisClient.Get<string>("codis-proxy");
+                        log.DebugFormat("查询addr:{0},redis:{0}={1}", redisClient.Host + redisClient.Port, "codis-proxy", value);
+                    }
+                    System.Threading.Thread.Sleep(500);
+                }
+                catch (Exception ex)
+                {
+                    log.ErrorFormat("异常信息:{0}", ex.ToString());
+                }
+            }
+        }
     }
     public static class RedisPoolManager
     {
         private static readonly RedisPool redisPool;
         static RedisPoolManager()
         {
-            redisPool = RoundRobinSSRedisPool.Create().CuratorClient("192.168.4.144:20000", 5000).ZkProxyDir("mango").Build();
+            //redisPool = RoundRobinSSRedisPool.Create().CuratorClient("192.168.4.144:20000", 5000).ZkProxyDir("mango").Build();
+            redisPool = RoundRobinSSRedisPool.Create().CuratorClient("192.168.4.77:2181,192.168.4.78:2181,192.168.4.79:2181", 5000).ZkProxyDir("codis-mango").Build();
         }
         public static IRedisClient GetClient()
         {

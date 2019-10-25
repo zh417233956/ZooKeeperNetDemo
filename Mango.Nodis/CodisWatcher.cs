@@ -19,17 +19,17 @@ namespace Mango.Nodis
         private string path;
 
         //TODO:正式使用
-        //public string Path
-        //{
-        //    get { return $"/jodis/{path}"; }
-        //    set { path = value; }
-        //}
-
         public string Path
         {
-            get { return $"/jodis.{path}"; }
+            get { return $"/jodis/{path}"; }
             set { path = value; }
         }
+
+        //public string Path
+        //{
+        //    get { return $"/jodis.{path}"; }
+        //    set { path = value; }
+        //}
 
         private List<CodisProxyInfo> pools;
         public CodisWatcher(ILog log, ZooKeeperClient zk, string path, AddNodeDel addNodeDel, DeleteNodeDel deleteNodeDel) : base(log, zk)
@@ -71,7 +71,7 @@ namespace Mango.Nodis
                         try
                         {
                             _ = _zk.client.CreateAsync("/jodis", null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-                            _log.DebugFormat($"创建根节点:/jodis");
+                            _log.InfoFormat($"创建根节点:/jodis");
                         }
                         catch (Exception ex)
                         {
@@ -79,18 +79,18 @@ namespace Mango.Nodis
                         }
                     }
                     _ = this.GetPools();
-                    _log.DebugFormat($"初始化节点开始");
-                    _log.DebugFormat($"online上线节点:");
+                    _log.InfoFormat($"初始化节点开始");
+                    _log.InfoFormat($"online上线节点:");
                     pools.FindAll(m => m.State == "online").Select(m => m.Addr).Distinct().ToList().ForEach(n =>
                     {
-                        _log.DebugFormat($"{n}");
+                        _log.InfoFormat($"{n}");
                     });
-                    _log.DebugFormat($"初始化节点完成");
+                    _log.InfoFormat($"初始化节点完成");
 
-                    //_log.DebugFormat($"offline下线节点:");
+                    //_log.InfoFormat($"offline下线节点:");
                     //pools.FindAll(m => m.State == "offline").Select(m => m.Addr).Distinct().ToList().ForEach(n =>
                     //{
-                    //    _log.DebugFormat($"{n}");
+                    //    _log.InfoFormat($"{n}");
                     //});
                 }
                 //return CompletedTask;
@@ -132,7 +132,7 @@ namespace Mango.Nodis
                         var deletedPools= new List<CodisProxyInfo>();
                         deletePools.ForEach(n =>
                         {
-                            //_log.DebugFormat($"删除节点:{n.Node}={n.Addr}-{n.State}");
+                            //_log.InfoFormat($"删除节点:{n.Node}={n.Addr}-{n.State}");
                             deletedPools.Add(n);
                             pools.Remove(n);
                         });
@@ -150,12 +150,12 @@ namespace Mango.Nodis
                         }
                         //addPools.ForEach(n =>
                         //{
-                        //    _log.DebugFormat($"新增节点:{n.Node}={n.Addr}-{n.State}");
+                        //    _log.InfoFormat($"新增节点:{n.Node}={n.Addr}-{n.State}");
                         //});
                     }
                     //pools.FindAll(m => m.Flag == 2).ForEach(n =>
                     //{
-                    //    _log.DebugFormat($"编辑节点:{n.Node}={n.Addr}-{n.State}");
+                    //    _log.InfoFormat($"编辑节点:{n.Node}={n.Addr}-{n.State}");
                     //});
                 }
                 return CompletedTask;

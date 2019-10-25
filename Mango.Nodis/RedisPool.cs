@@ -69,7 +69,7 @@ namespace Mango.Nodis
             var pools = zkhelper.pools;
             foreach (var itemCodisProxy in pools)
             {
-                log.DebugFormat($"加载节点:{itemCodisProxy.Node}={itemCodisProxy.Addr}-{itemCodisProxy.State}");
+                log.InfoFormat($"加载节点:{itemCodisProxy.Node}={itemCodisProxy.Addr}-{itemCodisProxy.State}");
             }
             #endregion 打日志
 
@@ -106,7 +106,6 @@ namespace Mango.Nodis
             // 无密码的格式：127.0.0.1:6379
             var pools = zkhelper.pools;
             string[] redisMasterHosts = pools.Select(m => m.Addr).ToArray();
-
             // 如果Redis服务器是主从配置，则还需要读取Redis Slave机的IP配置信息
             string[] redisSlaveHosts = null;
             //string slaveConnection = null;
@@ -118,8 +117,7 @@ namespace Mango.Nodis
             int defaultDb = 0;
             var redisClientManagerConfig = new RedisClientManagerConfig
             {
-                MaxReadPoolSize = 1,
-                MaxWritePoolSize = 1,
+                MaxWritePoolSize = 2,
                 DefaultDb = defaultDb,
                 AutoStart = true
             };
@@ -127,7 +125,9 @@ namespace Mango.Nodis
             if (Manager != null)
             {
                 Manager.Dispose();
+                log.InfoFormat("销毁Redis连接池完成");
             }
+            log.InfoFormat("创建Redis连接池，redisMasterHosts：{0}", redisMasterHosts);
             Manager = new PooledRedisClientManager(redisMasterHosts, redisSlaveHosts, redisClientManagerConfig)
             {
                 PoolTimeout = 2000,
