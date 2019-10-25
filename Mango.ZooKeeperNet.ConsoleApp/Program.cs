@@ -138,7 +138,7 @@ namespace Mango.ZooKeeperNet.ConsoleApp
             {
                 redisClient.Db = 5;
                 redisClient.Set<string>("codis-proxy", "nodis");
-                log.DebugFormat("写入addr:{0},redis:{1}={2}", redisClient.Host + redisClient.Port, "codis-proxy", "nodis");
+                log.DebugFormat("写入addr:{0}:{1},redis:{2}={3}", redisClient.Host, redisClient.Port, "codis-proxy", "nodis");
             }
             while (true)
             {
@@ -148,7 +148,7 @@ namespace Mango.ZooKeeperNet.ConsoleApp
                     {
                         redisClient.Db = 5;
                         var value = redisClient.Get<string>("codis-proxy");
-                        log.DebugFormat("查询addr:{0},redis:{0}={1}", redisClient.Host + redisClient.Port, "codis-proxy", value);
+                        log.DebugFormat("查询addr:{0}:{1},redis:{2}={3}", redisClient.Host, redisClient.Port, "codis-proxy", value);
                     }
                     System.Threading.Thread.Sleep(500);
                 }
@@ -157,7 +157,7 @@ namespace Mango.ZooKeeperNet.ConsoleApp
                     log.ErrorFormat("异常信息:{0}", ex.ToString());
                 }
             }
-            Console.ReadKey();
+            //Console.ReadKey();
         }
     }
     public static class RedisPoolManager
