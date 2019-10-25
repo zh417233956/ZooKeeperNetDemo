@@ -64,7 +64,7 @@ namespace Mango.ZooKeeperNet.WebApp.Controllers
         }
         public static void Init(string zkhosts, string db_proxy)
         {
-            redisPool = RoundRobinSSRedisPool.Create().CuratorClient(zkhosts, 5000).ZkProxyDir(db_proxy).Build();
+            redisPool = RoundRobinSSRedisPool.Create().CuratorClient(zkhosts, 5000).ZkProxyDir(db_proxy).PoolConfig(2).Build();
         }
         public static IRedisClient GetClient()
         {
