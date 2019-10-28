@@ -19,7 +19,7 @@ namespace Mango.ZooKeeperNet.WebApp.Controllers
             string result = "null";
             try
             {
-                using (var redisClient = RedisPoolManager.GetClient())
+                using (var redisClient = RedisPoolBuilder.GetClient())
                 {
                     redisClient.Db = 5;
                     var value = redisClient.Get<string>("codis-proxy");
@@ -53,22 +53,6 @@ namespace Mango.ZooKeeperNet.WebApp.Controllers
         // DELETE api/values/5
         public void Delete(int id)
         {
-        }
-    }
-    public static class RedisPoolManager
-    {
-        private static RedisPool redisPool;
-        static RedisPoolManager()
-        {
-
-        }
-        public static void Init(string zkhosts, string db_proxy)
-        {
-            redisPool = RoundRobinSSRedisPool.Create().CuratorClient(zkhosts, 5000).ZkProxyDir(db_proxy).PoolConfig(2).Build();
-        }
-        public static IRedisClient GetClient()
-        {
-            return redisPool.GetClient();
         }
     }
 }

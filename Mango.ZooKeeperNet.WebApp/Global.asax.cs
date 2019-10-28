@@ -19,7 +19,7 @@ namespace Mango.ZooKeeperNet.WebApp
 
             //初始化日志
             log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "Configs/log4net.config"));
-            Controllers.RedisPoolManager.Init("192.168.4.77:2181,192.168.4.78:2181,192.168.4.79:2181", "codis-mango");
+            Nodis.RedisPoolBuilder.Init("192.168.4.77:2181,192.168.4.78:2181,192.168.4.79:2181", "codis-mango", 2, 0);
         }
     }
 }
