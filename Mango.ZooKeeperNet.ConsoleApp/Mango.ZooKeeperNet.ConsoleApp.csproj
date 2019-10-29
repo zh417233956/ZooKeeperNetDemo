@@ -35,6 +35,12 @@
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Mango.Nodis, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mango.Nodis.1.0.0\lib\net45\Mango.Nodis.dll</HintPath>
+    </Reference>
+    <Reference Include="Mango.ZooKeeperNet.Util, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mango.ZooKeeperNet.Util.1.0.0\lib\net45\Mango.ZooKeeperNet.Util.dll</HintPath>
+    </Reference>
     <Reference Include="Rabbit.Zookeeper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Rabbit.Zookeeper.1.0.0\lib\net45\Rabbit.Zookeeper.dll</HintPath>
     </Reference>
@@ -47,11 +53,12 @@
     <Reference Include="ServiceStack.Redis, Version=3.9.71.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ServiceStack.Redis.3.9.71\lib\net35\ServiceStack.Redis.dll</HintPath>
     </Reference>
-    <Reference Include="ServiceStack.Text, Version=3.9.11.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ServiceStack.Text.3.9.11\lib\net35\ServiceStack.Text.dll</HintPath>
+    <Reference Include="ServiceStack.Text, Version=3.9.71.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Text.3.9.71\lib\net35\ServiceStack.Text.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -60,6 +67,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="ZooKeeperNetEx, Version=3.4.9.3, Culture=neutral, PublicKeyToken=42cd15de36f9b993, processorArchitecture=MSIL">
       <HintPath>..\packages\ZooKeeperNetEx.3.4.9.3\lib\net45\ZooKeeperNetEx.dll</HintPath>
+    </Reference>
+    <Reference Include="ZooKeeperNetEx.Recipes, Version=3.4.9.3, Culture=neutral, PublicKeyToken=42cd15de36f9b993, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZooKeeperNetEx.Recipes.3.4.9.3\lib\net45\ZooKeeperNetEx.Recipes.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -72,16 +82,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Mango.Nodis\Mango.Nodis.csproj">
-      <Project>{3f5b2186-245b-4cab-9ac5-317d5be0a9c2}</Project>
-      <Name>Mango.Nodis</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mango.ZooKeeperNet.Util\Mango.ZooKeeperNet.Util.csproj">
-      <Project>{4a5550be-5316-4c00-89d3-25218110ea25}</Project>
-      <Name>Mango.ZooKeeperNet.Util</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
