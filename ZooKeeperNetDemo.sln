@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mango.Nodis", "Mango.Nodis\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mango.ZooKeeperNet.WebApp", "Mango.ZooKeeperNet.WebApp\Mango.ZooKeeperNet.WebApp.csproj", "{AAEE2FFA-E92A-40BC-AF5C-627D4B174FCC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mango.ZooKeeperNet.ConsoleAppCore", "Mango.ZooKeeperNet.ConsoleAppCore\Mango.ZooKeeperNet.ConsoleAppCore.csproj", "{338729EE-CA17-4462-9487-53361438F58F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{AAEE2FFA-E92A-40BC-AF5C-627D4B174FCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAEE2FFA-E92A-40BC-AF5C-627D4B174FCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAEE2FFA-E92A-40BC-AF5C-627D4B174FCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{338729EE-CA17-4462-9487-53361438F58F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{338729EE-CA17-4462-9487-53361438F58F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{338729EE-CA17-4462-9487-53361438F58F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{338729EE-CA17-4462-9487-53361438F58F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
