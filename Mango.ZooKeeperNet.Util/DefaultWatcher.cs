@@ -52,9 +52,7 @@ namespace Mango.ZooKeeperNet.Util
                         //网络断开重试 间隔30秒
                         waitState = _zk.client.WaitForKeeperState(Watcher.Event.KeeperState.SyncConnected, TimeSpan.FromSeconds(30));
                     }
-                    _log.InfoFormat("RetryUntilConnected，上线成功");
-                    //启用监听
-                    ProcessWatched();
+                    _log.InfoFormat("RetryUntilConnected，上线成功");                   
                 }
                 return CompletedTask;
             });

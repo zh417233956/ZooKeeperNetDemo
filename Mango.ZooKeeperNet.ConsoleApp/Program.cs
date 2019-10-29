@@ -132,7 +132,7 @@ namespace Mango.ZooKeeperNet.ConsoleApp
             }
             Console.ReadKey();
         }
-        static void Main(string[] args)
+        static void Main7(string[] args)
         {
             using (var redisClient = RedisPoolManager.GetClient())
             {
@@ -158,6 +158,24 @@ namespace Mango.ZooKeeperNet.ConsoleApp
                 }
             }
             //Console.ReadKey();
+        }
+        static void Main(string[] args)
+        {
+            Nodis.RedisPoolBuilder.Init("192.168.4.77:2181,192.168.4.78:2181,192.168.4.79:2181", "codis-mango", 2, 0);
+            try
+            {
+                using (var redisClient = Nodis.RedisPoolBuilder.GetClient())
+                {
+                    redisClient.Db = 5;
+                    var value = redisClient.Get<string>("codis-proxy");
+                    log.DebugFormat("查询addr:{0}:{1},redis:{2}={3}", redisClient.Host, redisClient.Port, "codis-proxy", value);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.ErrorFormat("异常信息:{0}", ex.ToString());
+            }
+            Console.ReadKey();
         }
     }
     public static class RedisPoolManager
