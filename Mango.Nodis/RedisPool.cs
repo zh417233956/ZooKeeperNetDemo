@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using log4net;
+
 #if NETFRAMEWORK
 using ServiceStack.Redis;
 #else
-            
+using StackExchange.Redis;
 #endif
 
 namespace Mango.Nodis
@@ -15,29 +16,10 @@ namespace Mango.Nodis
     public class RedisPool
     {
 #if NETFRAMEWORK
+        #region NETFRAMEWORK
         private ILog log = LogManager.GetLogger(typeof(RedisPool));
 
         private IRedisClientsManager Manager;
-
-        #region ZK配置
-        private string zkAddr;
-        private int zkSessionTimeoutMs;
-        private string zkProxyDir;
-        private ZooKeeperHelper zkhelper;
-        public RedisPool CuratorClient(string zkAddr, int zkSessionTimeoutMs = 20)
-        {
-            this.zkAddr = zkAddr;
-            this.zkSessionTimeoutMs = zkSessionTimeoutMs;
-            return this;
-        }
-
-        public RedisPool ZkProxyDir(string zkProxyDir)
-        {
-            this.zkProxyDir = zkProxyDir;
-            return this;
-        }
-        #endregion ZK配置
-
 
         int maxWritePoolSize = 1;
         int defaultDb = 0;
@@ -50,7 +32,7 @@ namespace Mango.Nodis
 
         public RedisPool Build()
         {
-            #region zk配置获取及建立监听
+        #region zk配置获取及建立监听
             validate();
             if (zkhelper != null)
             {
@@ -74,16 +56,16 @@ namespace Mango.Nodis
                     CreateManager();
                 });
 
-            #region 打日志
+        #region 打日志
             //TODO:日志代码
             var pools = zkhelper.pools;
             foreach (var itemCodisProxy in pools)
             {
                 log.InfoFormat($"加载节点:{itemCodisProxy.Node}={itemCodisProxy.Addr}-{itemCodisProxy.State}");
             }
-            #endregion 打日志
+        #endregion 打日志
 
-            #endregion zk配置获取及建立监听
+        #endregion zk配置获取及建立监听
 
             CreateManager();
 
@@ -137,14 +119,14 @@ namespace Mango.Nodis
                 log.InfoFormat("销毁Redis连接池完成");
             }
 
-            #region 只为打日志
+        #region 只为打日志
             string redisMasterHostsStr = "";
             foreach (var itemHost in redisMasterHosts)
             {
                 redisMasterHostsStr += itemHost + ",";
             }
-            log.InfoFormat("创建Redis连接池，redisMasterHosts：{0}", redisMasterHostsStr.TrimEnd(','));
-            #endregion 只为打日志
+            log.InfoFormat("创建Redis连接池，RedisMasterHosts：{0}", redisMasterHostsStr.TrimEnd(','));
+        #endregion 只为打日志
 
             Manager = new PooledRedisClientManager(redisMasterHosts, redisSlaveHosts, redisClientManagerConfig)
             {
@@ -152,6 +134,140 @@ namespace Mango.Nodis
                 ConnectTimeout = 1000
             };
         }
+        #endregion NETFRAMEWORK
+#else
+        #region NETSTANDARD
+
+
+        private ILog log = LogManager.GetLogger(typeof(RedisPool));
+        int defaultDb = 0;
+        public RedisPool DefaultDB(int defaultdb = 0)
+        {
+            this.defaultDb = defaultdb;
+            return this;
+        }
+        public RedisPool Build()
+        {
+            #region zk配置获取及建立监听
+            validate();
+            if (zkhelper != null)
+            {
+                zkhelper.Dispose();
+            }
+            zkhelper = new ZooKeeperHelper(log, zkAddr, zkProxyDir, zkSessionTimeoutMs,
+                (nodes) =>
+                {
+                    foreach (var item in nodes)
+                    {
+                        log.InfoFormat("新增节点：{0}", item.Addr);
+                    }
+                    CreateInstance();
+                },
+                (nodes) =>
+                {
+                    foreach (var item in nodes)
+                    {
+                        log.InfoFormat("删除节点：{0}", item.Addr);
+                    }
+                    CreateInstance();
+                });
+
+            #region 打日志
+            //TODO:日志代码
+            var pools = zkhelper.pools;
+            foreach (var itemCodisProxy in pools)
+            {
+                log.InfoFormat($"加载节点:{itemCodisProxy.Node}={itemCodisProxy.Addr}-{itemCodisProxy.State}");
+            }
+            #endregion 打日志
+
+            #endregion zk配置获取及建立监听
+
+            CreateInstance();
+
+            return this;
+        }
+
+        /// <summary>
+        /// 获取连接的数据库
+        /// </summary>
+        /// <returns></returns>
+        public IDatabase GetClient()
+        {
+            try
+            {
+                return Instance.GetDatabase();
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
+        }
+        /// <summary>
+        /// 获取Redis连接实例
+        /// </summary>
+        /// <returns></returns>
+        public ConnectionMultiplexer GetInstance()
+        {
+            try
+            {
+                return Instance;
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
+        }
+        /// <summary>
+        /// 连接实例
+        /// </summary>
+        private ConnectionMultiplexer Instance = null;
+
+        /// <summary>
+        /// 使用一个静态属性来返回已连接的实例，如下列中所示。这样，一旦 ConnectionMultiplexer 断开连接，便可以初始化新的连接实例。
+        /// </summary>
+        public void CreateInstance()
+        {
+            if (Instance != null)
+            {
+                Instance.Close();
+                Instance.Dispose();
+                log.InfoFormat("销毁Redis实例完成");
+            }
+
+            #region 只为打日志
+            string redisMasterHostsStr = "";
+            foreach (var itemHost in zkhelper.pools)
+            {
+                redisMasterHostsStr += itemHost.Addr + ",";
+            }
+            log.InfoFormat("创建Redis实例，RedisHosts：{0}", redisMasterHostsStr.TrimEnd(','));
+            #endregion 只为打日志
+            var constr = "{0}DefaultDatabase={1}";
+            Instance = ConnectionMultiplexer.Connect(string.Format(constr,redisMasterHostsStr, defaultDb));
+        }
+        #endregion
+#endif
+
+        #region ZK配置
+        private string zkAddr;
+        private int zkSessionTimeoutMs;
+        private string zkProxyDir;
+        private ZooKeeperHelper zkhelper;
+        public RedisPool CuratorClient(string zkAddr, int zkSessionTimeoutMs = 20)
+        {
+            this.zkAddr = zkAddr;
+            this.zkSessionTimeoutMs = zkSessionTimeoutMs;
+            return this;
+        }
+
+        public RedisPool ZkProxyDir(string zkProxyDir)
+        {
+            this.zkProxyDir = zkProxyDir;
+            return this;
+        }
+        #endregion ZK配置
+
         private void validate()
         {
             if (string.IsNullOrEmpty(zkProxyDir))
@@ -163,8 +279,5 @@ namespace Mango.Nodis
                 throw new Exception("zk client can not be null");
             }
         }
-#else
-            
-#endif
     }
 }

@@ -9,29 +9,27 @@ namespace Mango.ZooKeeperNet.ConsoleAppCore
     {
         private static bool logState;
 
-        private static ILog _log;
-
-        public static ILog log 
-        {
-            get {
-                if (_log==null)
-                {
-                    var logRepository = log4net.LogManager.CreateRepository("NETCoreRepository");
-                    XmlConfigurator.Configure(logRepository, new System.IO.FileInfo("Configs/log4net.config"));
-                    _log = LogManager.GetLogger(logRepository.Name, typeof(Program));
-                }
-                return _log;
-            }
-        }
+        private static ILog log;
 
         static void Main(string[] args)
         {
-            // 加载log4net日志配置文件
+            //加载log4net日志配置文件
+            XmlConfigurator.Configure(LogManager.CreateRepository("log4net-default-repository"), new System.IO.FileInfo("Configs/log4net.config"));
+            //初始化redis连接信息
+            Nodis.RedisPoolBuilder.Init("192.168.4.77:2181,192.168.4.78:2181,192.168.4.79:2181", "codis-mango", 5);
+            try
+            {
+                log = LogManager.GetLogger(typeof(Program));
+                var redisClient = Nodis.RedisPoolBuilder.GetDatabase(5);
+                var value = redisClient.StringGet("codis-proxy");
+                log.DebugFormat("查询redis:{0}={1}", "codis-proxy", value);
+            }
+            catch (Exception ex)
+            {
+                log.ErrorFormat("异常信息:{0}", ex.ToString());
+            }
+            Console.ReadKey();
 
-            log.DebugFormat("日志打印测试");
-            log.ErrorFormat("日志打印测试");
-
-            Console.WriteLine("Hello World!");
             Console.ReadLine();
         }
     }

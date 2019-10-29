@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 #if NETFRAMEWORK
 using ServiceStack.Redis;
 #else
+using StackExchange.Redis;
 #endif
 
 namespace Mango.Nodis
@@ -23,6 +24,28 @@ namespace Mango.Nodis
             return redisPool.GetClient();
         }
 #else
+        private static RedisPool instance;
+        public static void Init(string zkhosts, string db_proxy, int defaultdb = 0)
+        {
+            instance = SERedisClient.Create().CuratorClient(zkhosts, 5000).ZkProxyDir(db_proxy).DefaultDB(defaultdb).Build();
+        }
+        /// <summary>
+        /// 获取Redis连接实例
+        /// </summary>
+        /// <returns></returns>
+        public static ConnectionMultiplexer GetInstance()
+        {
+            return instance.GetInstance();
+        }
+        /// <summary>
+        /// 获取数据库
+        /// </summary>
+        /// <param name="db">-1为默认连接的数据库</param>
+        /// <returns></returns>
+        public static IDatabase GetDatabase(int db = -1)
+        {
+            return GetInstance().GetDatabase(db);
+        }
 #endif
     }
 }

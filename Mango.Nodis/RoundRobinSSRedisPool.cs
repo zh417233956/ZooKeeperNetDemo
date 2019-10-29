@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿#if NETFRAMEWORK
+
+#else
+using StackExchange.Redis;
+#endif
 
 namespace Mango.Nodis
 {
+#if NETFRAMEWORK
+
+
     public static class RoundRobinSSRedisPool
     {
         private static RedisPool redisPool;
@@ -18,4 +21,18 @@ namespace Mango.Nodis
             return redisPool;
         }
     }
+#else
+    public static class SERedisClient
+    {
+        private static RedisPool instance;
+        public static RedisPool Create()
+        {
+            if (instance == null)
+            {
+                instance = new RedisPool();
+            }
+            return instance;
+        }
+    }
+#endif
 }
