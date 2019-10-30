@@ -187,7 +187,7 @@ namespace Mango.Nodis
 
             return this;
         }
- 
+
         /// <summary>
         /// 获取Redis连接实例
         /// </summary>
@@ -202,23 +202,12 @@ namespace Mango.Nodis
                 }
                 else
                 {
-                    var IsConnected = false;
-                    DateTime dtStart = DateTime.Now;
-                    while (!IsConnected)
-                    {
-                        IsConnected = Instance.IsConnected;
-                        if ((DateTime.Now - dtStart).TotalSeconds > 30)
-                        {
-                            throw new Exception("获取连接实例超时");
-                        }
-
-                    }
-                    return Instance;
+                    throw new Exception("连接实例已断开");
                 }
             }
             catch (System.Exception ex)
             {
-                log.ErrorFormat("获取Redis连接实例异常:{0}",ex.Message);
+                log.ErrorFormat("获取Redis连接实例异常:{0}", ex.Message);
                 return null;
             }
         }
@@ -241,12 +230,17 @@ namespace Mango.Nodis
 
             if (Instance != null)
             {
-                Instance.CloseAsync().Wait();
-                Instance.Dispose();
+                ConnectionMultiplexer oldInstance = null;
+                lock (Instance)
+                {
+                    oldInstance = Instance;                   
+                    log.InfoFormat("重新创建Redis实例，RedisHosts：{0}", redisMasterHostsStr.TrimEnd(','));
+                    Instance = ConnectionMultiplexer.Connect(string.Format(constr, redisMasterHostsStr, defaultDb));
+                }
+                System.Threading.Thread.Sleep(1000);
+                oldInstance.CloseAsync();
+                oldInstance.Dispose();
                 log.InfoFormat("销毁Redis实例完成");
-                log.InfoFormat("创建Redis实例，RedisHosts：{0}", redisMasterHostsStr.TrimEnd(','));
-                Instance = ConnectionMultiplexer.Connect(string.Format(constr, redisMasterHostsStr, defaultDb));
-
             }
             else
             {
