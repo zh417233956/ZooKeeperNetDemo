@@ -8,14 +8,26 @@ using System.Threading.Tasks;
 
 namespace Mango.ZooKeeperNet.Util
 {
+    /// <summary>
+    /// ZooKeeperClient的默认监听类
+    /// 可继承重写其监听实现
+    /// </summary>
     public class DefaultWatcher
     {
         public static ILog _log;
+        /// <summary>
+        /// ZooKeeper客户端
+        /// </summary>
         public ZooKeeperClient _zk;
         /// <summary>
         /// zk重连状态标记 0连接状态，1断开连接
         /// </summary>
         public int _zkReconnPoolState = 0;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="zk"></param>
         public DefaultWatcher(ILog log, ZooKeeperClient zk)
         {
             if (log == null)
@@ -27,6 +39,10 @@ namespace Mango.ZooKeeperNet.Util
         }
 
         public static readonly Task CompletedTask = Task.FromResult(1);
+        /// <summary>
+        /// 监听实现
+        /// 可重写
+        /// </summary>
         public virtual void ProcessWatched()
         {
             _zk.SubscribeStatusChange((ct, args) =>

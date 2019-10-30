@@ -44,7 +44,12 @@ namespace Mango.Nodis
         /// <returns></returns>
         public static IDatabase GetDatabase(int db = -1)
         {
-            return GetInstance().GetDatabase(db);
+            var client = GetInstance();
+            if (client == null)
+            {
+                return null;
+            }
+            return client.GetDatabase(db);
         }
 #endif
     }

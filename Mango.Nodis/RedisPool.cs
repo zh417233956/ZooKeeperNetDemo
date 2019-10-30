@@ -187,22 +187,7 @@ namespace Mango.Nodis
 
             return this;
         }
-
-        /// <summary>
-        /// 获取连接的数据库
-        /// </summary>
-        /// <returns></returns>
-        public IDatabase GetClient()
-        {
-            try
-            {
-                return Instance.GetDatabase();
-            }
-            catch (System.Exception)
-            {
-                return null;
-            }
-        }
+ 
         /// <summary>
         /// 获取Redis连接实例
         /// </summary>
@@ -211,10 +196,29 @@ namespace Mango.Nodis
         {
             try
             {
-                return Instance;
+                if (Instance.IsConnected)
+                {
+                    return Instance;
+                }
+                else
+                {
+                    var IsConnected = false;
+                    DateTime dtStart = DateTime.Now;
+                    while (!IsConnected)
+                    {
+                        IsConnected = Instance.IsConnected;
+                        if ((DateTime.Now - dtStart).TotalSeconds > 30)
+                        {
+                            throw new Exception("获取连接实例超时");
+                        }
+
+                    }
+                    return Instance;
+                }
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
+                log.ErrorFormat("获取Redis连接实例异常:{0}",ex.Message);
                 return null;
             }
         }
@@ -228,23 +232,29 @@ namespace Mango.Nodis
         /// </summary>
         public void CreateInstance()
         {
-            if (Instance != null)
-            {
-                Instance.Close();
-                Instance.Dispose();
-                log.InfoFormat("销毁Redis实例完成");
-            }
-
-            #region 只为打日志
             string redisMasterHostsStr = "";
             foreach (var itemHost in zkhelper.pools)
             {
                 redisMasterHostsStr += itemHost.Addr + ",";
             }
-            log.InfoFormat("创建Redis实例，RedisHosts：{0}", redisMasterHostsStr.TrimEnd(','));
-            #endregion 只为打日志
             var constr = "{0}DefaultDatabase={1}";
-            Instance = ConnectionMultiplexer.Connect(string.Format(constr,redisMasterHostsStr, defaultDb));
+
+            if (Instance != null)
+            {
+                Instance.CloseAsync().Wait();
+                Instance.Dispose();
+                log.InfoFormat("销毁Redis实例完成");
+                log.InfoFormat("创建Redis实例，RedisHosts：{0}", redisMasterHostsStr.TrimEnd(','));
+                Instance = ConnectionMultiplexer.Connect(string.Format(constr, redisMasterHostsStr, defaultDb));
+
+            }
+            else
+            {
+                #region 只为打日志         
+                log.InfoFormat("创建Redis实例，RedisHosts：{0}", redisMasterHostsStr.TrimEnd(','));
+                #endregion 只为打日志            
+                Instance = ConnectionMultiplexer.Connect(string.Format(constr, redisMasterHostsStr, defaultDb));
+            }
         }
         #endregion
 #endif

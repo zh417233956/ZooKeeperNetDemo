@@ -8,6 +8,9 @@ namespace Mango.ZooKeeperNet.Util
 {
     public enum AuthEnum
     {
+        /// <summary>
+        /// 无需授权
+        /// </summary>
         world = 0,
         auth = 1,
         digest = 2,

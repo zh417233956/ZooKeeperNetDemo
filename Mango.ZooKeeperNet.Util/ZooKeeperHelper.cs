@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Mango.ZooKeeperNet.Util
 {
+    /// <summary>
+    /// ZK单独连接使用帮助类库
+    /// </summary>
     public class ZooKeeperHelper
     {
         private readonly ILog _log;
@@ -19,7 +22,12 @@ namespace Mango.ZooKeeperNet.Util
         private string _success = "success";
         private string _fail = "fail";
 
-
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="address">ZK地址</param>
+        /// <param name="sessionTimeOut">会话超时时间(ms)</param>
         public ZooKeeperHelper(ILog log, List<string> address, int sessionTimeOut = 10 * 1000)
         {
             _log = log;
@@ -29,7 +37,7 @@ namespace Mango.ZooKeeperNet.Util
 
 
         /// <summary>
-        /// 返回null表示连接不成功
+        /// 建立ZK连接 返回null表示连接不成功
         /// </summary>
         /// <param name="authEnum"></param>
         /// <param name="authInfo"></param>
