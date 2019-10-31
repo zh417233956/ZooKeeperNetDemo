@@ -13,7 +13,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mango.ZooKeeperNet.WebApp",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mango.ZooKeeperNet.ConsoleAppCore", "Mango.ZooKeeperNet.ConsoleAppCore\Mango.ZooKeeperNet.ConsoleAppCore.csproj", "{338729EE-CA17-4462-9487-53361438F58F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mango.ZooKeeperNet.WebAppCore", "Mango.ZooKeeperNet.WebAppCore\Mango.ZooKeeperNet.WebAppCore.csproj", "{72853AF0-F4C4-46FE-895F-CD358446E75D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mango.ZooKeeperNet.WebAppCore", "Mango.ZooKeeperNet.WebAppCore\Mango.ZooKeeperNet.WebAppCore.csproj", "{72853AF0-F4C4-46FE-895F-CD358446E75D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mango.Nodis.NetCore.Test", "Mango.Nodis.NetCore.Test\Mango.Nodis.NetCore.Test.csproj", "{3FFDDB1A-621D-4208-B04C-AEC308A72130}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mango.Nodis.Net.Test", "Mango.Nodis.Net.Test\Mango.Nodis.Net.Test.csproj", "{360C96F1-FACC-434D-A9B3-F4973595516D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +49,14 @@ Global
 		{72853AF0-F4C4-46FE-895F-CD358446E75D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72853AF0-F4C4-46FE-895F-CD358446E75D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72853AF0-F4C4-46FE-895F-CD358446E75D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FFDDB1A-621D-4208-B04C-AEC308A72130}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FFDDB1A-621D-4208-B04C-AEC308A72130}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FFDDB1A-621D-4208-B04C-AEC308A72130}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FFDDB1A-621D-4208-B04C-AEC308A72130}.Release|Any CPU.Build.0 = Release|Any CPU
+		{360C96F1-FACC-434D-A9B3-F4973595516D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{360C96F1-FACC-434D-A9B3-F4973595516D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{360C96F1-FACC-434D-A9B3-F4973595516D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{360C96F1-FACC-434D-A9B3-F4973595516D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
