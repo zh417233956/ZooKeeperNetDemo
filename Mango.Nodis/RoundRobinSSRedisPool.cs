@@ -8,7 +8,9 @@ namespace Mango.Nodis
 {
 #if NETFRAMEWORK
 
-
+    /// <summary>
+    /// Redis连接池实例化类
+    /// </summary>
     public static class RoundRobinSSRedisPool
     {
         private static RedisPool redisPool;
@@ -22,6 +24,9 @@ namespace Mango.Nodis
         }
     }
 #else
+    /// <summary>
+    /// Redis连接池实例化类
+    /// </summary>
     public static class SERedisClient
     {
         private static RedisPool instance;

@@ -9,9 +9,19 @@ using System.Threading.Tasks;
 
 namespace Mango.Nodis
 {
+    /// <summary>
+    /// Codis Proxy监听类
+    /// </summary>
     public class CodisWatcher : DefaultWatcher
     {
+        /// <summary>
+        /// 删除节点委托
+        /// </summary>
+        /// <param name="pools"></param>
         public delegate void DeleteNodeDel(List<CodisProxyInfo> pools);
+        /// <summary>
+        /// 增加节点委托
+        /// </summary>
         public delegate void AddNodeDel(List<CodisProxyInfo> pools);
         /// <summary>
         /// 要监听的节点
@@ -30,14 +40,28 @@ namespace Mango.Nodis
         //    get { return $"/jodis.{path}"; }
         //    set { path = value; }
         //}
-
+        /// <summary>
+        /// 当前的节点列表
+        /// </summary>
         private List<CodisProxyInfo> pools;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="zk">ZK地址，多个以“,”分割</param>
+        /// <param name="path">CodisProxy实例名</param>
+        /// <param name="addNodeDel">增加节点的委托事件</param>
+        /// <param name="deleteNodeDel">移除节点的委托事件</param>
         public CodisWatcher(ILog log, ZooKeeperClient zk, string path, AddNodeDel addNodeDel, DeleteNodeDel deleteNodeDel) : base(log, zk)
         {
             this.addNodeDel = addNodeDel;
             this.deleteNodeDel = deleteNodeDel;
             this.path = path;
         }
+        /// <summary>
+        /// 获取当前服务器节点
+        /// </summary>
+        /// <returns></returns>
         public List<CodisProxyInfo> GetPools()
         {
             if (pools == null || _zkReconnPoolState == 1)
@@ -67,9 +91,14 @@ namespace Mango.Nodis
         }
         private DeleteNodeDel deleteNodeDel;
         private AddNodeDel addNodeDel;
+        /// <summary>
+        /// 监听实现
+        /// </summary>
         public override void ProcessWatched()
         {
+            //调用基类的实现
             base.ProcessWatched();
+            //订阅连接状态变更
             _zk.SubscribeStatusChange(async (ct, args) =>
             {
                 if (args.State == Watcher.Event.KeeperState.SyncConnected)
@@ -104,6 +133,7 @@ namespace Mango.Nodis
                 }
                 //return CompletedTask;
             });
+            //订阅节点子节点变更
             _zk.SubscribeChildrenChange(Path, (ct, args) =>
             {
                 CodisProxyInfo poolCodisProxy = null;

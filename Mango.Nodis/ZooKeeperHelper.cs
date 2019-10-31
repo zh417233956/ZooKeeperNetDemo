@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Mango.Nodis
 {
+    /// <summary>
+    /// zk配置及建立监听
+    /// </summary>
     public class ZooKeeperHelper : IDisposable
     {
         private static ILog _log;
@@ -15,6 +18,15 @@ namespace Mango.Nodis
         private CodisWatcher.DeleteNodeDel deleteNodeDel;
         private CodisWatcher.AddNodeDel addNodeDel;
         CodisWatcher codiswatcher;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="log"></param>
+        /// <param name="connectionString"></param>
+        /// <param name="proxy"></param>
+        /// <param name="SessionTimeout"></param>
+        /// <param name="addNodeDel"></param>
+        /// <param name="deleteNodeDel"></param>
         public ZooKeeperHelper(ILog log, string connectionString, string proxy, double SessionTimeout = 20, CodisWatcher.AddNodeDel addNodeDel = null, CodisWatcher.DeleteNodeDel deleteNodeDel = null)
         {
             _log = log;
@@ -24,6 +36,9 @@ namespace Mango.Nodis
             codiswatcher = new CodisWatcher(log, _zk, proxy, addNodeDel, deleteNodeDel);
             codiswatcher.ProcessWatched();
         }
+        /// <summary>
+        /// 当前的节点列表
+        /// </summary>
         public List<CodisProxyInfo> pools => codiswatcher.GetPools();
 
         /// <summary>

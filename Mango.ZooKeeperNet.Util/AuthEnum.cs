@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Mango.ZooKeeperNet.Util
 {
+    /// <summary>
+    /// ZK连接授权方式
+    /// </summary>
     public enum AuthEnum
     {
         /// <summary>
